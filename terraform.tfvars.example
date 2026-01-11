@@ -1,0 +1,42 @@
+# Proxmox Connection Settings
+proxmox_endpoint     = "https://192.168.1.10:8006"
+proxmox_username     = "root@pam"
+proxmox_password     = "your-proxmox-password"
+proxmox_insecure     = true
+proxmox_ssh_username = "root"
+
+# VM Configuration
+vm_name      = "ubuntu-2404-vm"
+vm_id        = 100
+target_node  = "pve"
+vm_memory    = 2048
+vm_cores     = 2
+vm_sockets   = 1
+vm_disk_size = "32G"
+vm_storage   = "local-lvm"
+
+# Network Configuration
+vm_bridge = "vmbr0"
+
+# Option 1: Use DHCP (leave these empty)
+vm_ip_address = ""
+vm_gateway    = ""
+
+# Option 2: Use static IP (uncomment and configure)
+# vm_ip_address = "192.168.1.100/24"
+# vm_gateway    = "192.168.1.1"
+
+vm_nameserver = "8.8.8.8"
+
+# Cloud-Init Configuration
+cloud_init_user     = "ubuntu"
+cloud_init_password = "your-secure-password"
+
+# SSH Public Key (recommended - paste your public key here)
+ssh_public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC... your-public-key-here"
+
+# Ubuntu Image
+ubuntu_image_url = "https://cloud-images.ubuntu.com/releases/24.04/release/ubuntu-24.04-server-cloudimg-amd64.img"
+
+# VM Behavior
+start_on_create = true
