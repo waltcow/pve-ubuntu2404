@@ -1,8 +1,10 @@
 resource "proxmox_virtual_environment_download_file" "ubuntu_cloud_image" {
-  content_type = "iso"
-  datastore_id = var.vm_storage
+  content_type = "import"
+  datastore_id = var.vm_image_storage
   node_name    = var.target_node
   url          = var.ubuntu_image_url
+  file_name    = "ubuntu-24.04-server-cloudimg-amd64.qcow2"
+  overwrite    = false
 }
 
 resource "proxmox_virtual_environment_vm" "ubuntu_vm" {
@@ -14,8 +16,10 @@ resource "proxmox_virtual_environment_vm" "ubuntu_vm" {
   started = var.start_on_create
 
   agent {
-    enabled = true
+    enabled = false
   }
+
+  stop_on_destroy = true
 
   cpu {
     cores   = var.vm_cores
@@ -28,7 +32,7 @@ resource "proxmox_virtual_environment_vm" "ubuntu_vm" {
 
   disk {
     datastore_id = var.vm_storage
-    file_id      = proxmox_virtual_environment_download_file.ubuntu_cloud_image.id
+    import_from  = proxmox_virtual_environment_download_file.ubuntu_cloud_image.id
     interface    = "virtio0"
     iothread     = true
     discard      = "on"

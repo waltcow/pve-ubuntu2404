@@ -1,9 +1,16 @@
 # Proxmox Connection Settings
 proxmox_endpoint     = "https://192.168.1.10:8006"
-proxmox_username     = "root@pam"
-proxmox_password     = "your-proxmox-password"
 proxmox_insecure     = true
 proxmox_ssh_username = "root"
+
+# Authentication Method 1: API Token (推荐 - 更安全)
+# 在 Proxmox 中创建: Datacenter → Permissions → API Tokens
+proxmox_api_token = "terraform@pve!provider=3906db8d-edab-4582-86ad-3b65582e3f8c"
+
+# Authentication Method 2: Username & Password (备选)
+# 如果使用 API token，注释掉或留空下面两行
+# proxmox_username = "root@pam"
+# proxmox_password = "your-proxmox-password"
 
 # VM Configuration
 vm_name      = "ubuntu-2404-vm"
@@ -35,8 +42,8 @@ cloud_init_password = "your-secure-password"
 # SSH Public Key (recommended - paste your public key here)
 ssh_public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC... your-public-key-here"
 
-# Ubuntu Image
-ubuntu_image_url = "https://cloud-images.ubuntu.com/releases/24.04/release/ubuntu-24.04-server-cloudimg-amd64.img"
+# Ubuntu Image (using Tsinghua mirror for faster download in China)
+ubuntu_image_url = "https://mirrors.tuna.tsinghua.edu.cn/ubuntu-cloud-images/noble/current/noble-server-cloudimg-amd64.img"
 
 # VM Behavior
 start_on_create = true

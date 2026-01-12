@@ -1,29 +1,29 @@
 output "vm_id" {
-  description = "The ID of the created VM"
+  description = "已创建虚拟机的 ID"
   value       = proxmox_virtual_environment_vm.ubuntu_vm.id
 }
 
 output "vm_name" {
-  description = "The name of the created VM"
+  description = "已创建虚拟机的名称"
   value       = proxmox_virtual_environment_vm.ubuntu_vm.name
 }
 
 output "vm_node" {
-  description = "The Proxmox node where the VM is running"
+  description = "虚拟机运行所在的 Proxmox 节点"
   value       = proxmox_virtual_environment_vm.ubuntu_vm.node_name
 }
 
 output "vm_ip_addresses" {
-  description = "The IP addresses assigned to the VM"
+  description = "分配给虚拟机的 IP 地址"
   value       = proxmox_virtual_environment_vm.ubuntu_vm.ipv4_addresses
 }
 
 output "vm_mac_addresses" {
-  description = "The MAC addresses of the VM's network interfaces"
+  description = "虚拟机网络接口的 MAC 地址"
   value       = proxmox_virtual_environment_vm.ubuntu_vm.mac_addresses
 }
 
 output "vm_status" {
-  description = "The current status of the VM"
+  description = "虚拟机的当前状态"
   value       = proxmox_virtual_environment_vm.ubuntu_vm.started
 }
