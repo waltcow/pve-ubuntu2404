@@ -1,26 +1,24 @@
 # Proxmox Connection Settings
-proxmox_endpoint     = "https://192.168.1.10:8006"
-proxmox_insecure     = true
-proxmox_ssh_username = "root"
-
-# Authentication Method 1: API Token (推荐 - 更安全)
+proxmox_endpoint          = "https://pve3.gzpolpo.net:8006"
+proxmox_insecure          = true
+# Authentication Method: API Token (推荐 - 更安全)
 # 在 Proxmox 中创建: Datacenter → Permissions → API Tokens
 proxmox_api_token = "terraform@pve!provider=3906db8d-edab-4582-86ad-3b65582e3f8c"
 
-# Authentication Method 2: Username & Password (备选)
-# 如果使用 API token，注释掉或留空下面两行
-# proxmox_username = "root@pam"
-# proxmox_password = "your-proxmox-password"
+# SSH Authentication (for uploading cloud-init snippets)
+proxmox_ssh_username = "root"
+proxmox_ssh_private_key_path = "/path/to/your/id_ed25519"
 
 # VM Configuration
 vm_name      = "ubuntu-2404-vm"
 vm_id        = 100
-target_node  = "pve"
-vm_memory    = 2048
-vm_cores     = 2
+target_node  = "pve3"  # 使用你的实际节点名称，可通过 Proxmox Web UI 查看
+vm_memory    = 4096
+vm_cores     = 4
 vm_sockets   = 1
-vm_disk_size = "32G"
-vm_storage   = "local-lvm"
+vm_disk_size      = "32G"
+vm_storage        = "local-lvm"
+vm_snippets_storage = "local"  # 必须支持 snippets 内容类型,可能需要改为其他存储
 
 # Network Configuration
 vm_bridge = "vmbr0"
@@ -42,8 +40,25 @@ cloud_init_password = "your-secure-password"
 # SSH Public Key (recommended - paste your public key here)
 ssh_public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC... your-public-key-here"
 
-# Ubuntu Image (using Tsinghua mirror for faster download in China)
-ubuntu_image_url = "https://mirrors.tuna.tsinghua.edu.cn/ubuntu-cloud-images/noble/current/noble-server-cloudimg-amd64.img"
+# Ubuntu Image (existing file in Proxmox storage)
+ubuntu_image_file_name = "ubuntu-24.04-server-cloudimg-amd64.img"
+
+# APT Mirror Configuration (for package installation speed)
+apt_mirror_url = "https://mirrors.tuna.tsinghua.edu.cn/ubuntu/"
+
+# NVIDIA Driver Configuration
+# Set to true to automatically install NVIDIA driver during VM creation
+enable_nvidia_driver = false
+
+# NVIDIA driver version (570 required for RTX 5090)
+nvidia_driver_version = "570"
+
+# GPU Passthrough Configuration
+enable_gpu_passthrough = false
+gpu_device_id     = "10de:2b85"
+gpu_subsystem_id  = "1458:4198"
+gpu_iommu_group   = 30
+gpu_pci_path      = "0000:01:00"
 
 # VM Behavior
 start_on_create = true

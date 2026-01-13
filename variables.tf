@@ -4,19 +4,6 @@ variable "proxmox_endpoint" {
   type        = string
 }
 
-variable "proxmox_username" {
-  description = "Proxmox VE 用户名 (例如: root@pam)"
-  type        = string
-  default     = "root@pam"
-}
-
-variable "proxmox_password" {
-  description = "Proxmox VE 密码 (如果使用 API token 则留空)"
-  type        = string
-  sensitive   = true
-  default     = ""
-}
-
 variable "proxmox_api_token" {
   description = "Proxmox VE API 令牌 (格式: USER@REALM!TOKENID=SECRET)"
   type        = string
@@ -31,9 +18,15 @@ variable "proxmox_insecure" {
 }
 
 variable "proxmox_ssh_username" {
-  description = "用于 Proxmox 主机操作的 SSH 用户名"
+  description = "Proxmox 节点 SSH 用户名（用于上传 cloud-init snippets）"
   type        = string
   default     = "root"
+}
+
+variable "proxmox_ssh_private_key_path" {
+  description = "Proxmox 节点 SSH 私钥路径（本地文件，必须是绝对路径）"
+  type        = string
+  default     = ""
 }
 
 # VM Configuration Variables
@@ -58,7 +51,7 @@ variable "target_node" {
 variable "vm_memory" {
   description = "内存大小 (单位: MB)"
   type        = number
-  default     = 2048
+  default     = 4096
 }
 
 variable "vm_cores" {
@@ -74,9 +67,9 @@ variable "vm_sockets" {
 }
 
 variable "vm_disk_size" {
-  description = "磁盘大小 (单位: GB)"
-  type        = number
-  default     = 32
+  description = "磁盘大小 (例如: \"32G\")"
+  type        = string
+  default     = "32G"
 }
 
 variable "vm_storage" {
@@ -87,6 +80,12 @@ variable "vm_storage" {
 
 variable "vm_image_storage" {
   description = "云镜像下载存储池 (必须是基于文件的存储如 local)"
+  type        = string
+  default     = "local"
+}
+
+variable "vm_snippets_storage" {
+  description = "Cloud-init snippets 存储池 (必须支持 snippets 内容类型)"
   type        = string
   default     = "local"
 }
@@ -112,7 +111,7 @@ variable "vm_gateway" {
 variable "vm_nameserver" {
   description = "DNS 名称服务器"
   type        = string
-  default     = "8.8.8.8"
+  default     = "114.114.114.114"
 }
 
 variable "cloud_init_user" {
@@ -122,7 +121,7 @@ variable "cloud_init_user" {
 }
 
 variable "cloud_init_password" {
-  description = "Cloud-init 用户密码"
+  description = "Cloud-init 用户密码 (留空则不设置密码并锁定本地口令)"
   type        = string
   sensitive   = true
   default     = ""
@@ -134,14 +133,65 @@ variable "ssh_public_key" {
   default     = ""
 }
 
-variable "ubuntu_image_url" {
-  description = "Ubuntu 24.04 云镜像 URL"
+variable "ubuntu_image_file_name" {
+  description = "云镜像文件名（需与 Proxmox 存储中的文件一致）"
   type        = string
-  default     = "https://mirrors.tuna.tsinghua.edu.cn/ubuntu-cloud-images/noble/current/noble-server-cloudimg-amd64.img"
+  default     = "ubuntu-24.04-server-cloudimg-amd64.img"
 }
 
 variable "start_on_create" {
   description = "创建后启动虚拟机"
   type        = bool
   default     = true
+}
+
+# APT Mirror Configuration
+variable "apt_mirror_url" {
+  description = "APT 镜像源 URL (用于加速软件包下载)"
+  type        = string
+  default     = "https://mirrors.tuna.tsinghua.edu.cn/ubuntu/"
+}
+
+# NVIDIA Driver Configuration
+variable "enable_nvidia_driver" {
+  description = "是否自动安装 NVIDIA 驱动"
+  type        = bool
+  default     = false
+}
+
+variable "nvidia_driver_version" {
+  description = "NVIDIA 驱动版本 (例如: 570 用于 RTX 5090，将自动使用 nvidia-driver-{version}-open 开源驱动)"
+  type        = string
+  default     = "570"
+}
+
+# GPU Passthrough Configuration
+variable "enable_gpu_passthrough" {
+  description = "是否启用 GPU 直通"
+  type        = bool
+  default     = false
+}
+
+variable "gpu_device_id" {
+  description = "GPU 设备 ID (例如: 10de:2b85)"
+  type        = string
+  default     = ""
+}
+
+variable "gpu_subsystem_id" {
+  description = "GPU 子系统 ID (例如: 1458:4198)"
+  type        = string
+  default     = ""
+}
+
+variable "gpu_iommu_group" {
+  description = "GPU IOMMU group 编号"
+  type        = number
+  default     = 0
+}
+
+variable "gpu_pci_path" {
+  description = "GPU PCI 路径 (例如: 0000:01:00)"
+  type        = string
+  default     = ""
 }

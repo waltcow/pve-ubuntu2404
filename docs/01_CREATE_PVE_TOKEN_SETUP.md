@@ -20,8 +20,6 @@ nano terraform.tfvars  # 或使用你喜欢的编辑器
 # Proxmox 连接设置
 proxmox_endpoint     = "https://你的PVE服务器IP:8006"
 proxmox_insecure     = true
-proxmox_ssh_username = "root"
-
 # 使用 API Token 认证（已为你填好）
 proxmox_api_token = "terraform@pve!provider=3906db8d-edab-4582-86ad-3b65582e3f8c"
 
@@ -121,6 +119,4 @@ curl -k -H "Authorization: PVEAPIToken=terraform@pve!provider=3906db8d-edab-4582
 # proxmox_api_token = "..."
 
 # 启用用户名密码
-proxmox_username = "root@pam"
-proxmox_password = "你的密码"
 ```

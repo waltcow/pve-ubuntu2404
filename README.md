@@ -4,12 +4,12 @@
 
 ## 功能特性
 
-- 🚀 从 Ubuntu 24.04 云镜像自动创建虚拟机
+- 🚀 从 Ubuntu 24.04 云镜像创建虚拟机
 - ☁️ 使用 Cloud-init 进行初始化配置
 - 🔑 支持 SSH 密钥认证
 - 🌐 支持静态 IP 或 DHCP 配置
 - 📦 可自定义 CPU、内存和磁盘资源
-- 🔄 自动从清华镜像源下载云镜像
+- 🧩 使用已有云镜像文件创建虚拟机
 
 ## 前置要求
 
@@ -44,12 +44,8 @@ cp terraform.tfvars.example terraform.tfvars
 # Proxmox 连接信息
 proxmox_endpoint = "https://你的-PROXMOX-IP:8006"
 
-# 方式 1: 使用 API Token（推荐）
+# 使用 API Token（推荐）
 proxmox_api_token = "terraform@pve!provider=你的-token-secret"
-
-# 方式 2: 使用用户名密码（备选，如使用 API token 则注释掉）
-# proxmox_username = "root@pam"
-# proxmox_password = "你的密码"
 
 # 虚拟机设置
 vm_name      = "ubuntu-web-server"
@@ -89,7 +85,7 @@ terraform apply
 ```
 
 输入 `yes` 确认。Terraform 将会：
-1. 下载 Ubuntu 24.04 云镜像到 Proxmox 存储
+1. 使用 `vm_image_storage` 中已存在的 Ubuntu 24.04 云镜像
 2. 使用你指定的配置创建虚拟机
 3. 配置 cloud-init 进行首次启动
 4. 启动虚拟机（如果 `start_on_create = true`）
@@ -114,10 +110,9 @@ ssh ubuntu@<IP地址>
 | 变量 | 说明 | 默认值 |
 |------|------|--------|
 | `proxmox_endpoint` | Proxmox API 端点 URL | - |
-| `proxmox_username` | Proxmox 用户名 | `root@pam` |
-| `proxmox_password` | Proxmox 密码 | - |
 | `proxmox_insecure` | 跳过 TLS 验证 | `true` |
-| `proxmox_ssh_username` | Proxmox 主机 SSH 用户 | `root` |
+| `proxmox_ssh_username` | Proxmox SSH 用户名（上传 snippets） | `root` |
+| `proxmox_ssh_private_key_path` | Proxmox SSH 私钥路径（绝对路径） | `""` |
 
 ### 虚拟机资源
 
@@ -129,7 +124,7 @@ ssh ubuntu@<IP地址>
 | `vm_memory` | 内存大小（MB） | `2048` |
 | `vm_cores` | CPU 核心数 | `2` |
 | `vm_sockets` | CPU 插槽数 | `1` |
-| `vm_disk_size` | 磁盘大小（如 "32G"） | `32G` |
+| `vm_disk_size` | 磁盘大小（如 "32G"） | `"32G"` |
 | `vm_storage` | 存储池 | `local-lvm` |
 
 ### 网络配置
@@ -146,9 +141,19 @@ ssh ubuntu@<IP地址>
 | 变量 | 说明 | 默认值 |
 |------|------|--------|
 | `cloud_init_user` | 默认用户名 | `ubuntu` |
-| `cloud_init_password` | 用户密码 | `""` |
+| `cloud_init_password` | 用户密码（留空则不设置密码并锁定本地口令） | `""` |
 | `ssh_public_key` | SSH 公钥 | `""` |
-| `ubuntu_image_url` | Ubuntu 云镜像 URL | 清华镜像源 |
+| `ubuntu_image_file_name` | 云镜像文件名 | `ubuntu-24.04-server-cloudimg-amd64.img` |
+
+### GPU 直通
+
+| 变量 | 说明 | 默认值 |
+|------|------|--------|
+| `enable_gpu_passthrough` | 是否启用 GPU 直通 | `false` |
+| `gpu_device_id` | GPU 设备 ID | `""` |
+| `gpu_subsystem_id` | GPU 子系统 ID | `""` |
+| `gpu_iommu_group` | GPU IOMMU group 编号 | `0` |
+| `gpu_pci_path` | GPU PCI 路径 | `""` |
 
 ## 常见使用场景
 
@@ -162,7 +167,7 @@ terraform workspace new vm2
 terraform apply -var="vm_name=ubuntu-vm2" -var="vm_id=101"
 ```
 
-### 使用 API Token 代替密码（推荐）
+### 使用 API Token（推荐）
 
 **创建 API Token**:
 1. 登录 Proxmox Web UI
@@ -179,9 +184,6 @@ terraform apply -var="vm_name=ubuntu-vm2" -var="vm_id=101"
 # 使用完整的 token 字符串
 proxmox_api_token = "terraform@pve!provider=3906db8d-edab-4582-86ad-3b65582e3f8c"
 
-# 注释掉密码认证
-# proxmox_username = "root@pam"
-# proxmox_password = "your-password"
 ```
 
 配置会自动检测并使用 API token 认证。
@@ -218,10 +220,10 @@ terraform output
 
 ### 云镜像下载失败
 
-如果 Ubuntu 镜像下载失败：
-1. 检查 Proxmox 节点是否有互联网访问权限
-2. 验证存储池有足够的空间
-3. 尝试手动下载并调整 `ubuntu_image_url`
+如果 Ubuntu 镜像不存在或无法访问：
+1. 确认 `vm_image_storage` 中已存在 `ubuntu_image_file_name`
+2. 检查存储池可用空间
+3. 确认镜像文件名拼写一致
 
 ### 找不到存储池
 
@@ -263,18 +265,17 @@ pvesm status
 terraform destroy
 ```
 
-输入 `yes` 确认。这将删除虚拟机和已下载的云镜像。
+输入 `yes` 确认。这将删除虚拟机。
 
 ## 安全最佳实践
 
 1. **永远不要提交 `terraform.tfvars`** - 已添加到 `.gitignore`
 2. **尽可能使用 SSH 密钥**代替密码
-3. **使用 API token** 代替 root 密码
+3. **使用 API token** 进行认证
 4. **在生产环境启用 TLS 验证**（`proxmox_insecure = false`）
 5. **使用环境变量或密钥管理存储敏感变量**：
 
 ```bash
-export TF_VAR_proxmox_password="你的密码"
 export TF_VAR_cloud_init_password="虚拟机密码"
 terraform apply
 ```
@@ -302,4 +303,4 @@ terraform apply
 
 ---
 
-**注意**：首次执行 `terraform apply` 可能需要几分钟，因为需要下载 Ubuntu 云镜像（约 700MB）到 Proxmox 存储。后续使用相同镜像创建虚拟机将会快得多。
+**注意**：请提前在 `vm_image_storage` 中准备好 Ubuntu 云镜像文件，确保 `ubuntu_image_file_name` 可被正确解析。

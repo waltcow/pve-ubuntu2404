@@ -101,6 +101,40 @@ agent {
 ```
 参考 provider 文档的 cloud-init.md 指南创建自定义 user_data_file_id。
 
+### NVIDIA GPU Passthrough 和驱动配置
+⚠️ **重要**: RTX 5090 等新一代 GPU **必须**使用 NVIDIA 开源内核模块！
+
+**自动驱动安装配置**:
+```hcl
+enable_nvidia_driver = true
+nvidia_driver_version = "570"  # 将自动安装 nvidia-driver-570-open
+```
+
+**关键要点**:
+- ✅ **开源驱动要求**: RTX 5090 和其他新 GPU 必须使用 `nvidia-driver-xxx-open` 包（配置已自动处理）
+- ✅ **UEFI 模式**: 已配置 `bios = "ovmf"` 和 `machine = "q35"` 以支持 GPU passthrough
+- ✅ **PCIe 模式**: GPU mapping 配置 `pcie = true` 以获得最佳性能
+- ⚠️ **驱动加载错误**: 如果看到 `requires use of the NVIDIA open kernel modules`，说明安装了闭源驱动，需改为开源驱动
+
+**手动切换到开源驱动**（如果已安装闭源驱动）:
+```bash
+# 卸载闭源驱动
+sudo apt remove --purge nvidia-driver-570 nvidia-dkms-570
+
+# 安装开源驱动
+sudo apt install nvidia-driver-570-open
+
+# 重启系统
+sudo reboot
+```
+
+**验证驱动**:
+```bash
+nvidia-smi                    # 应显示 GPU 信息
+lsmod | grep nvidia           # 确认内核模块已加载
+sudo dmesg | grep -i nvidia   # 检查加载日志
+```
+
 ### Proxmox 认证
 支持两种认证方式，provider 会自动根据配置选择：
 
@@ -122,8 +156,6 @@ proxmox_api_token = "terraform@pve!provider=3906db8d-edab-4582-86ad-3b65582e3f8c
 
 **方式 2 - 用户名/密码（备选）**:
 ```hcl
-proxmox_username = "root@pam"
-proxmox_password = "your-password"
 ```
 
 **SSH 连接**: 某些 provider 操作需要 SSH，默认使用 SSH agent
@@ -171,7 +203,6 @@ disk {
 
 ### 使用环境变量传递敏感信息
 ```bash
-export TF_VAR_proxmox_password="your-password"
 export TF_VAR_cloud_init_password="vm-password"
 terraform apply
 ```
@@ -227,4 +258,4 @@ terraform apply
 - 生产环境建议设置 `proxmox_insecure = false` 启用 TLS 验证
 - 优先使用 SSH 密钥而非密码进行 VM 访问
 - 考虑使用 API token 代替 root 密码进行 Proxmox 认证
-- 敏感变量 (`proxmox_password`, `cloud_init_password`) 已标记为 `sensitive = true`
+- 敏感变量 (`cloud_init_password`) 已标记为 `sensitive = true`

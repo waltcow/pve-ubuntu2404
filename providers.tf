@@ -11,16 +11,10 @@ provider "proxmox" {
   endpoint = var.proxmox_endpoint
   insecure = var.proxmox_insecure
 
-  # Use API token if provided, otherwise use username/password
-  api_token = var.proxmox_api_token != "" ? var.proxmox_api_token : null
-  username  = var.proxmox_api_token == "" ? var.proxmox_username : null
-  password  = var.proxmox_api_token == "" ? var.proxmox_password : null
+  api_token = var.proxmox_api_token
 
-  # SSH connection for some operations
   ssh {
-    agent    = true
-    username = var.proxmox_ssh_username
-    # 如果 ssh-agent 不可用，可以指定私钥路径
-    # private_key = file("~/.ssh/id_rsa")
+    username    = var.proxmox_ssh_username != "" ? var.proxmox_ssh_username : null
+    private_key = var.proxmox_ssh_private_key_path != "" ? file(var.proxmox_ssh_private_key_path) : null
   }
 }
