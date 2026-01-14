@@ -158,6 +158,13 @@ variable "apt_mirror_url" {
   default     = "https://mirrors.tuna.tsinghua.edu.cn/ubuntu/"
 }
 
+# Proxychains Configuration
+variable "proxychains_socks5_entry" {
+  description = "proxychains4 配置行（例如: socks5 127.0.0.1 7891 或包含用户名密码）"
+  type        = string
+  default     = "socks5 127.0.0.1 7891"
+}
+
 # NVIDIA Driver Configuration
 variable "enable_nvidia_driver" {
   description = "是否自动安装 NVIDIA 驱动"

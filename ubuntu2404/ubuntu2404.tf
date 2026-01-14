@@ -71,10 +71,14 @@ packages:
   - net-tools
   - dkms
   - linux-headers-generic
+  - proxychains4
 
 runcmd:
   - systemctl enable qemu-guest-agent
   - systemctl start qemu-guest-agent
+%{if var.proxychains_socks5_entry != "" ~}
+  - bash -c "grep -qF '${var.proxychains_socks5_entry}' /etc/proxychains4.conf || echo '${var.proxychains_socks5_entry}' >> /etc/proxychains4.conf"
+%{endif ~}
 %{if var.enable_nvidia_driver ~}
   - wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/cuda-keyring_1.1-1_all.deb -O /tmp/cuda-keyring.deb
   - dpkg -i /tmp/cuda-keyring.deb
