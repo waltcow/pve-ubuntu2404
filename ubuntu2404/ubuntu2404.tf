@@ -77,6 +77,7 @@ runcmd:
   - systemctl enable qemu-guest-agent
   - systemctl start qemu-guest-agent
 %{if var.proxychains_socks5_entry != "" ~}
+  - sed -i '/^socks4/d' /etc/proxychains4.conf
   - bash -c "grep -qF '${var.proxychains_socks5_entry}' /etc/proxychains4.conf || echo '${var.proxychains_socks5_entry}' >> /etc/proxychains4.conf"
 %{endif ~}
 %{if var.enable_nvidia_driver ~}
