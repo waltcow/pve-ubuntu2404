@@ -68,6 +68,7 @@ package_upgrade: false
 packages:
   - qemu-guest-agent
   - build-essential
+  - net-tools
   - dkms
   - linux-headers-generic
 

@@ -1,6 +1,10 @@
 # 使用 Terraform 在 Proxmox 上部署 Ubuntu 24.04 虚拟机
 
-此 Terraform 配置使用 [bpg/proxmox](https://registry.terraform.io/providers/bpg/proxmox/latest) provider 在 Proxmox VE 上创建 Ubuntu 24.04 LTS 虚拟机。
+此仓库包含两套独立的 Terraform 目录，使用 [bpg/proxmox](https://registry.terraform.io/providers/bpg/proxmox/latest) provider 在 Proxmox VE 上创建 Ubuntu 24.04 LTS 虚拟机。
+
+目录说明：
+- `ubuntu2404/`：通用 Ubuntu 24.04 VM 配置
+- `coder/`：Coder 单机 VM 配置（偏省资源）
 
 ## 功能特性
 
@@ -22,20 +26,36 @@
 
 ## 快速开始
 
-### 1. 克隆或下载此配置
+### 1. 选择目标目录
 
-确保你的目录中包含以下 Terraform 文件：
+根据用途进入对应目录：
+
+```bash
+cd "./ubuntu2404"
+# 或
+cd "./coder"
+```
+
+### 2. 确认目录内容
+
+`ubuntu2404/` 目录包含：
 - `providers.tf`
 - `variables.tf`
-- `ubuntu2404.tf`
 - `outputs.tf`
+- `ubuntu2404.tf`
 
-### 2. 创建变量配置文件
+`coder/` 目录包含：
+- `providers.tf`
+- `variables.tf`
+- `outputs.tf`
+- `coder.tf`
+
+### 3. 创建变量配置文件
 
 复制示例文件并自定义配置：
 
 ```bash
-cp terraform.tfvars.example terraform.tfvars
+cp "terraform.tfvars.example" "terraform.tfvars"
 ```
 
 编辑 `terraform.tfvars` 并填入实际值：
@@ -63,7 +83,7 @@ vm_gateway    = "192.168.1.1"       # 或使用 "" 启用 DHCP
 ssh_public_key = "ssh-rsa AAAAB3... 你的公钥"
 ```
 
-### 3. 初始化 Terraform
+### 4. 初始化 Terraform
 
 ```bash
 terraform init
@@ -71,7 +91,7 @@ terraform init
 
 此命令会下载 Proxmox provider 并准备工作空间。
 
-### 4. 查看执行计划
+### 5. 查看执行计划
 
 ```bash
 terraform plan
@@ -79,7 +99,7 @@ terraform plan
 
 此命令会显示将要创建的资源，但不会执行任何操作。
 
-### 5. 创建虚拟机
+### 6. 创建虚拟机
 
 ```bash
 terraform apply
@@ -91,7 +111,7 @@ terraform apply
 3. 配置 cloud-init 进行首次启动
 4. 启动虚拟机（如果 `start_on_create = true`）
 
-### 6. 访问虚拟机
+### 7. 访问虚拟机
 
 创建完成后，你可以通过 SSH 连接到虚拟机：
 
@@ -192,7 +212,7 @@ proxmox_api_token = "terraform@pve!provider=3906db8d-edab-4582-86ad-3b65582e3f8c
 
 ### 自定义 Cloud-Init 配置
 
-你可以通过修改 `ubuntu2404.tf` 中的 `initialization` 块来添加自定义 cloud-init 配置。
+你可以通过修改 `ubuntu2404/ubuntu2404.tf` 或 `coder/coder.tf` 中的 `initialization` 块来添加自定义 cloud-init 配置。
 
 ## 输出信息
 
