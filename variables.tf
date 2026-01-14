@@ -54,6 +54,12 @@ variable "vm_memory" {
   default     = 4096
 }
 
+variable "vm_memory_balloon" {
+  description = "内存气球最小值 (单位: MB，留空则不启用气球)"
+  type        = number
+  default     = null
+}
+
 variable "vm_cores" {
   description = "CPU 核心数"
   type        = number

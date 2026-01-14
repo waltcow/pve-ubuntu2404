@@ -52,6 +52,7 @@ vm_name      = "ubuntu-web-server"
 vm_id        = 100
 target_node  = "pve"
 vm_memory    = 4096
+vm_memory_balloon = 2048  # 可选：启用气球内存
 vm_cores     = 4
 
 # 网络配置（选择 DHCP 或静态 IP）
@@ -122,6 +123,7 @@ ssh ubuntu@<IP地址>
 | `vm_id` | 唯一虚拟机 ID | `100` |
 | `target_node` | Proxmox 节点名称 | `pve` |
 | `vm_memory` | 内存大小（MB） | `2048` |
+| `vm_memory_balloon` | 内存气球最小值（MB，留空则不启用） | `null` |
 | `vm_cores` | CPU 核心数 | `2` |
 | `vm_sockets` | CPU 插槽数 | `1` |
 | `vm_disk_size` | 磁盘大小（如 "32G"） | `"32G"` |

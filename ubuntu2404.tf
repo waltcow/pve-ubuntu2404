@@ -117,6 +117,7 @@ resource "proxmox_virtual_environment_vm" "ubuntu_vm" {
 
   memory {
     dedicated = var.vm_memory
+    floating  = var.vm_memory_balloon
   }
 
   # EFI 磁盘（UEFI 启动所需）

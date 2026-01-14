@@ -14,6 +14,7 @@ vm_name      = "ubuntu-2404-vm"
 vm_id        = 100
 target_node  = "pve3"  # 使用你的实际节点名称，可通过 Proxmox Web UI 查看
 vm_memory    = 4096
+vm_memory_balloon = 2048  # 可选：启用气球内存
 vm_cores     = 4
 vm_sockets   = 1
 vm_disk_size      = "32G"
