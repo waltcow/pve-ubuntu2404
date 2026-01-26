@@ -75,7 +75,7 @@ variable "vm_sockets" {
 variable "vm_disk_size" {
   description = "磁盘大小 (例如: \"32G\")"
   type        = string
-  default     = "32G"
+  default     = "32"
 }
 
 variable "vm_storage" {
@@ -142,7 +142,7 @@ variable "ssh_public_key" {
 variable "ubuntu_image_file_name" {
   description = "云镜像文件名（需与 Proxmox 存储中的文件一致）"
   type        = string
-  default     = "ubuntu-24.04-server-cloudimg-amd64.img"
+  default     = "noble-server-cloudimg-amd64.img"
 }
 
 variable "start_on_create" {

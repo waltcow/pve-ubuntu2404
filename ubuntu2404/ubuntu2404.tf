@@ -2,11 +2,11 @@
 resource "proxmox_virtual_environment_hardware_mapping_pci" "gpu_mapping" {
   count   = var.enable_gpu_passthrough ? 1 : 0
   name    = "gpu"
-  comment = "RTX 5090 GPU mapping for Terraform VMs"
+  comment = "NVIDIA RTX GPU mapping for Terraform VMs"
 
   map = [
     {
-      comment      = "Gigabyte RTX 5090 on ${var.target_node}"
+      comment      = "NVIDIA RTX on ${var.target_node}"
       id           = var.gpu_device_id
       iommu_group  = var.gpu_iommu_group
       node         = var.target_node
@@ -46,13 +46,13 @@ users:
     ssh_authorized_keys:
       - ${var.ssh_public_key}
 
-%{if var.cloud_init_password != "" ~}
+%{if var.cloud_init_password != ""~}
 # 设置用户密码（明文）
 chpasswd:
   expire: false
   list:
     - ${var.cloud_init_user}:${var.cloud_init_password}
-%{endif ~}
+%{endif~}
 
 apt:
   primary:
@@ -76,11 +76,11 @@ packages:
 runcmd:
   - systemctl enable qemu-guest-agent
   - systemctl start qemu-guest-agent
-%{if var.proxychains_socks5_entry != "" ~}
+%{if var.proxychains_socks5_entry != ""~}
   - sed -i '/^socks4/d' /etc/proxychains4.conf
   - bash -c "grep -qF '${var.proxychains_socks5_entry}' /etc/proxychains4.conf || echo '${var.proxychains_socks5_entry}' >> /etc/proxychains4.conf"
-%{endif ~}
-%{if var.enable_nvidia_driver ~}
+%{endif~}
+%{if var.enable_nvidia_driver~}
   - wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/cuda-keyring_1.1-1_all.deb -O /tmp/cuda-keyring.deb
   - dpkg -i /tmp/cuda-keyring.deb
   - apt-get update
@@ -88,7 +88,7 @@ runcmd:
   - rm -f /tmp/cuda-keyring.deb
   - echo "NVIDIA open driver ${var.nvidia_driver_version}-open installation completed at $(date)" >> /var/log/nvidia-install.log
   - shutdown -r +1 "Rebooting in 1 minute to load NVIDIA driver"
-%{endif ~}
+%{endif~}
 
 final_message: "Cloud-Init 设置完成。${var.enable_nvidia_driver ? "NVIDIA 驱动已安装。系统将很快重启。" : "系统已就绪。"}"
 EOF
@@ -99,7 +99,7 @@ EOF
 
 resource "proxmox_virtual_environment_vm" "ubuntu_vm" {
   name        = var.vm_name
-  description = "Ubuntu 24.04 LTS VM ${var.enable_nvidia_driver ? "with NVIDIA driver " : ""}managed by Terraform"
+  description = "Ubuntu 24.04 LTS VM${var.enable_gpu_passthrough ? " with RTX GPU passthrough" : ""}${var.enable_nvidia_driver ? " and NVIDIA driver ${var.nvidia_driver_version}-open" : ""} managed by Terraform"
   node_name   = var.target_node
   vm_id       = var.vm_id
 
