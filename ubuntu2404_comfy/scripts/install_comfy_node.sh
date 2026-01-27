@@ -68,6 +68,7 @@ apt_install_deps() {
     libpng-dev libjpeg-dev zlib1g-dev \
     libffi-dev \
     python3-dev \
+    python-is-python3 \
     build-essential \
     cmake \
     meson \
@@ -87,6 +88,7 @@ apt_install_deps() {
       libpng-dev libjpeg-dev zlib1g-dev \
       libffi-dev \
       python3-dev \
+      python-is-python3 \
       build-essential \
       cmake \
       meson \
